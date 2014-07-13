@@ -233,7 +233,7 @@ describe Puppet::Network::HTTP::Connection do
     end
   end
 
-  context "when response is a 503 or retryable exception is raised" do
+  context "when response is a 503 or an exception is raised" do
     let (:subject) { Puppet::Network::HTTP::Connection.new("my_server", 8140, :use_ssl => false, :verify => Puppet::SSL::Validator.no_validator) }
     let (:httpretry) { Net::HTTPServiceUnavailable.new('1.1', 503, 'Service Temporarily Unavailable') }
     let (:httpretry_body) { 'This page is temporarily unavailable' }
