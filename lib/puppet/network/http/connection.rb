@@ -97,7 +97,7 @@ module Puppet::Network::HTTP
     # @api public
     def head(path, headers = {}, options = {})
       opts = { :idempotent => true }.merge(options)
-      request_with_redirects(Net::HTTP::Head.new(path, headers), options)
+      request_with_redirects(Net::HTTP::Head.new(path, headers), opts)
     end
 
     # @param path [String]
