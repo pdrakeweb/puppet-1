@@ -190,6 +190,7 @@ module Puppet::Network::HTTP
       response = nil
       @retries_limit.times do |i|
         e = nil
+        response = nil
         begin
           response = execute_request(request)
           break if ![500, 502, 503, 504].include?(response.code.to_i)
@@ -199,12 +200,8 @@ module Puppet::Network::HTTP
         sleep 3
         # and try again...
       end
-      # We reached the max retries.  We should either raise our exception if we
-      # hit one on the last retry, or return our response.
-      # @todo make this work and test it
-      # raise e if e
-      # response
-      # @todo remove this
+      # We reached the max retries.  We should either return the last response
+      # or raise an exception if we have one from the latest attempt.
       return response if response
       raise RetryLimitExceededException, "Too many HTTP retries for #{@host}:#{@port}" if e
     end
