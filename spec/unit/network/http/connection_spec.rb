@@ -257,9 +257,9 @@ describe Puppet::Network::HTTP::Connection do
 
     it "should not retry non-idempotent requests" do
       httpok.stubs(:read_body).returns(:body)
-      Net::HTTPResponse.stubs(:read_new).returns(httpretry)
 
       subject.expects(:sleep).never
+      subject.expects(:execute_request).once.returns(httpretry)
       subject.put("/foo", "").body.should == :httpretry_body
     end
 
