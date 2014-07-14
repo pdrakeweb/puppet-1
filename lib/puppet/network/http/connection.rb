@@ -28,7 +28,7 @@ module Puppet::Network::HTTP
       :use_ssl => true,
       :verify => nil,
       :redirect_limit => 10,
-      :retry_limit => 3,
+      :retries_limit => 3,
     }
 
     @@openssl_initialized = false
@@ -62,7 +62,7 @@ module Puppet::Network::HTTP
       @use_ssl = options[:use_ssl]
       @verify = options[:verify]
       @redirect_limit = options[:redirect_limit]
-      @retry_limit = options[:retry_limit]
+      @retries_limit = options[:retries_limit]
     end
 
     # @!macro [new] common_options
@@ -188,15 +188,15 @@ module Puppet::Network::HTTP
     def request_with_retries(request)
       e = nil
       response = nil
-      @retry_limit.times do |i|
+      @retries_limit.times do |i|
         e = nil
         response = nil
         begin
           response = execute_request(request)
           break if ![500, 502, 503, 504].include?(response.code.to_i)
-        rescue SystemCallError, Net::HTTPBadResponse, Timeout::Error, SocketError => e
+        rescue Errno::ETIMEDOUT, Errno::ECONNREFUSED, Errno::ECONNRESET, Net::HTTPBadResponse, Timeout::Error, SocketError => e
         end
-        break if i >= (@retry_limit - 1)
+        break if i >= (@retries_limit - 1)
         sleep 3
         # and try again...
       end
